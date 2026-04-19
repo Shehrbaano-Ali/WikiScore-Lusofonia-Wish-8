@@ -78,3 +78,29 @@ tr:hover .veto-btn { opacity: 0.6; }
 .score-meta { font-size: 9px; text-transform: uppercase; margin-top: 2px; opacity: 0.8; }
 .bot-tag { background-color: #ef4444; color: white; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); font-weight: 800; }
 .edit-link { opacity: 0.4; transition: opacity 0.3s; font-size: 14px; margin-left: 8px; }
+
+/* This forces the table to stay readable. The user will swipe it left/right. */
+table {
+    min-width: 700px !important; /* Forces the columns to stay wide enough to read */
+}
+
+/* Fix the date inputs on mobile so they don't look like giant white boxes */
+input[type="date"] {
+    background: transparent;
+    color: #e2e8f0;
+    border: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+}
+
+/* Adjust padding for the main container on tiny screens */
+@media (max-width: 640px) {
+    body {
+        padding: 10px !important;
+    }
+    
+    .px-6 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
