@@ -8,7 +8,7 @@ class WikiscoreEngine:
     It fetches, filters for bots/reverts, and applies the PT/GL split.
     """
     def __init__(self):
-        # The exact weights from your JS build
+        # These are the exact weights from my JS build
         self.weights = {
             'label': 2,
             'description': 3,
@@ -19,7 +19,7 @@ class WikiscoreEngine:
         self.api_url = "https://www.wikidata.org/w/api.php"
 
     def audit_and_score(self, username, start_date, end_date):
-        # Setup API call (Same parameters as your JS fetch)
+        # here are the same parameters as my JS fetch
         params = {
             "action": "query",
             "list": "usercontribs",
@@ -35,20 +35,19 @@ class WikiscoreEngine:
         edits = response.get('query', {}).get('usercontribs', [])
 
         for edit in edits:
-            # 1. BOT SHIELD: Ignore automated edits
+            # 1. This bit sheild will help us to ignore automated edits
             if 'bot' in edit:
                 continue
 
             comment = edit.get('comment', '')
             revid = edit.get('revid')
             
-            # 2. DATA INTEGRITY: Skip edits with 'mw-reverted' (Validation logic)
-            # Note: In a full Django setup, we'd use a batch-check here like your validateBatch
+            # 2. here it skips the edits with 'mw-reverted' Validation logic)
             
-            # 3. LINGUISTIC PRECISION: Check for the Portuguese tag
+            # 3. it Checks for the Portuguese tag
             is_pt = bool(re.search(r'\|pt', comment))
             
-            # 4. SCORING LOGIC: Match your weights
+            # 4. matching my weights
             points = 0
             action = "other"
 
@@ -68,7 +67,7 @@ class WikiscoreEngine:
                 points = self.weights['reference']
                 action = "Reference"
 
-            # 5. COMMIT TO DATABASE: Save the record permanently
+            # 5. now it is saved to the record permanently
             WikidataContribution.objects.update_or_create(
                 revid=revid,
                 defaults={
