@@ -6,7 +6,7 @@ body { letter-spacing: -0.02em; background-color: #0a0a0c; }
 ::-webkit-scrollbar-track { background: #0a0a0c; }
 ::-webkit-scrollbar-thumb { background: #2d2d35; border-radius: 10px; }
 
-/* NEON STATUS LIGHT */
+/* HERE I SET NEON STATUS LIGHT */
 @keyframes neon-pulse {
     0% { opacity: 1; filter: brightness(1) drop-shadow(0 0 2px #00ff9d); }
     50% { opacity: 0.3; filter: brightness(0.5) drop-shadow(0 0 0px #00ff9d); }
