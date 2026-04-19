@@ -9,16 +9,16 @@ class WikidataContribution(models.Model):
     revid = models.BigIntegerField(unique=True)
     timestamp = models.DateTimeField()
     
-    # YOUR EXTRAORDINARY LOGIC: PT vs GL
+    # logic of PT vs GL
     # This separates the 'Linguistic' work from the 'Global' technical work
     is_portuguese = models.BooleanField(default=False)
     
-    # Categorization of the edit
-    action_type = models.CharField(max_length=50) # Label, Description, Claim, etc.
+    # below is the categorization of the edit
+    action_type = models.CharField(max_length=50) # Label, Description, Facts, etc.
     points = models.IntegerField(default=0)
 
     class Meta:
-        # Ensures we never double-count the same edit for the same user
+        # this ensures we never double count the same edit for the same user
         unique_together = ('username', 'revid')
         verbose_name = "Wikidata Contribution"
 
