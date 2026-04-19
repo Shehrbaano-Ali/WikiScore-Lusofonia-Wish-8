@@ -1,4 +1,4 @@
-# Shehrbano Ali - WikiScore-Lusofonia (Wish #8) Submission  
+# Shehrbano Ali - WikiScore-Lusofonia (Wish #8)
 
 **Name:** Shehrbano Ali  
 **Email:** shehrbanoali2230@gmail.com  
