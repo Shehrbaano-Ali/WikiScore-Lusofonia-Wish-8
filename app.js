@@ -167,7 +167,7 @@ function renderTable() {
     
     tbody.innerHTML = sorted.filter(p => p.name.toLowerCase().includes(filter)).map(p => `
         <tr class="border-b border-[#2d2d35] ${p.isVetoed ? 'grayscale' : ''}">
-            <td class="pl-12 pr-2 py-4 text-white font-bold flex items-center gap-2 w-[180px]">
+            <td class="pl-6 pr-2 py-4 text-white font-bold flex items-center gap-2 w-[180px]">
                 ${p.name}
                 ${(p.isBot && showBots) ? '<span class="bot-tag px-1 py-0.5 rounded ml-2">BOT</span>' : ''}
                 <div class="flex gap-2 ml-2">
