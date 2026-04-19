@@ -112,12 +112,12 @@ WikiScore-Lusofonia-Wish-8/
 ├── LICENSE            # MIT License 
 ├── README.md          # Technical documentation (this file)
 ├── app.js             # Core scoring engine & API integration
-├── badge_1000.png     # Achievement asset: Level 4
+├── badge_50.png     # Achievement asset: Level 4
 ├── badge_200.jpg      # Achievement asset: Level 2
-├── badge_2000.png     # Achievement asset: Level 5 
-├── badge_3000.png     # Achievement asset: Level 6 
-├── badge_50.jpg       # Achievement asset: Level 1 
-├── badge_500.jpg      # Achievement asset: Level 3 
+├── badge_500.png     # Achievement asset: Level 5 
+├── badge_1000.png     # Achievement asset: Level 6 
+├── badge_2000.jpg       # Achievement asset: Level 1 
+├── badge_3000.jpg      # Achievement asset: Level 3 
 ├── index.html         # Terminal UI structure & Organizer dashboard
 ├── my-prototype.png   # Full visual preview of the tool
 └── style.css          # Terminal aesthetic, animations & neon styling
