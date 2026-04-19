@@ -165,8 +165,9 @@ function renderTable() {
     const filter = document.getElementById('search-name').value.toLowerCase();
     
     tbody.innerHTML = sorted.filter(p => p.name.toLowerCase().includes(filter)).map(p => `
+    
         <tr class="border-b border-[#2d2d35] ${p.isVetoed ? 'grayscale' : ''}">
-            <td class="px-6 py-4 text-white font-bold flex items-center gap-2">
+            <td class="pl-12 pr-2 py-4 text-white font-bold flex items-center gap-2 w-[180px]">
                 ${p.name}
                 ${(p.isBot && showBots) ? '<span class="bot-tag px-1 py-0.5 rounded ml-2">BOT</span>' : ''}
                 <div class="flex gap-2 ml-2">
@@ -174,6 +175,7 @@ function renderTable() {
                     <button onclick="toggleVeto('${p.name}')" class="veto-btn ${p.isVetoed ? 'veto-active' : ''}">🚫</button>
                 </div>
             </td>
+
             <td class="px-6 py-4 text-[#38bdf8] text-[10px] font-mono">
                 ${p.workBreakdown}
                 ${(showBots && p.reverts > 0) ? `<span class="revert-subtle ml-2">(${p.reverts} reverted)</span>` : ''}
