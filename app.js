@@ -167,10 +167,10 @@ function renderTable() {
     
     tbody.innerHTML = sorted.filter(p => p.name.toLowerCase().includes(filter)).map(p => `
         <tr class="border-b border-[#2d2d35] ${p.isVetoed ? 'grayscale' : ''}">
-            <td class="pl-6 pr-2 py-4 text-white font-bold flex items-center gap-2 w-[180px]">
-                ${p.name}
+            <td class="pl-3 md:pl-6 pr-2 py-4 text-white font-bold flex items-center gap-1 md:gap-2 w-[130px] md:w-[180px]">
+                <span class="truncate">${p.name}</span>
                 ${(p.isBot && showBots) ? '<span class="bot-tag px-1 py-0.5 rounded ml-2">BOT</span>' : ''}
-                <div class="flex gap-2 ml-2">
+                <div class="flex gap-1 md:gap-2 ml-auto">
                     <a href="https://www.wikidata.org/wiki/Special:Contributions/${encodeURIComponent(p.name)}" target="_blank" class="edit-link">🔗</a>
                     <button onclick="toggleVeto('${p.name}')" class="veto-btn ${p.isVetoed ? 'veto-active' : ''}">🚫</button>
                 </div>
