@@ -88,6 +88,12 @@ tr:hover .veto-btn { opacity: 0.6; }
         padding: 10px !important;
     }
 
+    .date-input { width: 105px !important; } 
+
+    table {
+        min-width: 600px !important; 
+    }
+
     /* 2. here it prevents it from squishing */
     table {
         min-width: 600px !important; /* Forces the columns to stay readable */
@@ -102,7 +108,7 @@ tr:hover .veto-btn { opacity: 0.6; }
         border: 1px solid #2d2d35;
     }
 
-    /* 4. It willhrink the header text slightly for small phones */
+    /* 4. It will shrink the header text slightly for small phones */
     h1 {
         font-size: 1rem !important;
     }
