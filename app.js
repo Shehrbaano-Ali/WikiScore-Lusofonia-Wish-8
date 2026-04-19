@@ -1,3 +1,4 @@
+// 1. CONFIG
 const PROXY = "https://corsproxy.io/?"; 
 const badgeRules = [
     { pts: 50,   img: "badge_50.jpg",   rank: "Level 1" },
@@ -8,7 +9,7 @@ const badgeRules = [
     { pts: 3000, img: "badge_3000.png", rank: "Level 6" }
 ];
 
-// BELOW IS THE FULL LIST OF PARTICIPANTS
+// RESTORED: FULL LIST OF PARTICIPANTS (Offline Safety Net)
 const backupList = [
     { name: "Aleksey Bolger" }, { name: "Alethos2026" }, { name: "AmandaLDS" },
     { name: "Ana Beatriz Valenza de Oliveira" }, { name: "Ana Clara Ozório" },
@@ -165,7 +166,6 @@ function renderTable() {
     const filter = document.getElementById('search-name').value.toLowerCase();
     
     tbody.innerHTML = sorted.filter(p => p.name.toLowerCase().includes(filter)).map(p => `
-    
         <tr class="border-b border-[#2d2d35] ${p.isVetoed ? 'grayscale' : ''}">
             <td class="pl-12 pr-2 py-4 text-white font-bold flex items-center gap-2 w-[180px]">
                 ${p.name}
@@ -176,10 +176,17 @@ function renderTable() {
                 </div>
             </td>
 
-            <td class="px-6 py-4 text-[#38bdf8] text-[10px] font-mono">
-                ${p.workBreakdown}
-                ${(showBots && p.reverts > 0) ? `<span class="revert-subtle ml-2">(${p.reverts} reverted)</span>` : ''}
+            <td class="px-2 py-4 text-center">
+                <div class="flex items-center justify-center -space-x-3 mx-auto w-fit">
+                    ${p.earnedBadges.map(b => `
+                        <div class="achievement-wrapper">
+                            <img src="${b.img}" class="status-badge ${b.pts >= 2000 ? 'legendary-zoom' : ''}">
+                            <span class="badge-tooltip">${b.rank}</span>
+                        </div>
+                    `).join('')}
+                </div>
             </td>
+
             <td class="px-6 py-4 font-mono">
                 <div class="text-xl font-bold text-[#ef4444] ${p.isVetoed ? 'line-through' : ''}">${p.score}</div>
                 <div class="score-meta text-[#64748b]">
@@ -187,12 +194,16 @@ function renderTable() {
                     GL: <span class="text-[#38bdf8]">${p.scoreGL || 0}</span>
                 </div>
             </td>
-            <td class="px-6 py-4"><div class="flex items-center -space-x-3">${p.earnedBadges.map(b => `<div class="achievement-wrapper"><img src="${b.img}" class="status-badge ${b.pts >= 2000 ? 'legendary-zoom' : ''}"><span class="badge-tooltip">${b.rank}</span></div>`).join('')}</div></td>
+
+            <td class="px-6 py-4 text-[#38bdf8] text-[10px] font-mono">
+                ${p.workBreakdown}
+                ${(showBots && p.reverts > 0) ? `<span class="revert-subtle ml-2">(${p.reverts} reverted)</span>` : ''}
+            </td>
         </tr>
     `).join('');
 }
 
-// BELOW IS THE FORCE SYNC
+// NEW: EXTRAORDINARY FORCE SYNC
 function forceSync() {
     console.log("LOG: INITIATING_FORCE_SYNC...");
     localStorage.removeItem('cached_participants');
@@ -201,7 +212,7 @@ function forceSync() {
 
 async function harvestData(slug, isForced = false) {
     try {
-        // Here I Ensured we get the REAL list, not a saved version
+        // Cache-Busting: Ensures we get the REAL list, not a saved version
         const cacheBuster = isForced ? `?t=${Date.now()}` : '';
         const url = `https://outreachdashboard.wmflabs.org/courses/${slug}/users.json${cacheBuster}`;
         
