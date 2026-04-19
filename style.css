@@ -6,7 +6,7 @@ body { letter-spacing: -0.02em; background-color: #0a0a0c; }
 ::-webkit-scrollbar-track { background: #0a0a0c; }
 ::-webkit-scrollbar-thumb { background: #2d2d35; border-radius: 10px; }
 
-/* HERE I SET NEON STATUS LIGHT */
+/* NEON STATUS LIGHT */
 @keyframes neon-pulse {
     0% { opacity: 1; filter: brightness(1) drop-shadow(0 0 2px #00ff9d); }
     50% { opacity: 0.3; filter: brightness(0.5) drop-shadow(0 0 0px #00ff9d); }
@@ -80,36 +80,46 @@ tr:hover .veto-btn { opacity: 0.6; }
 .bot-tag { background-color: #ef4444; color: white; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); font-weight: 800; }
 .edit-link { opacity: 0.4; transition: opacity 0.3s; font-size: 14px; margin-left: 8px; }
 
-/* MOBILE RESPONSIVENESS */
+/* --- MOBILE RESPONSIVENESS --- */
 @media (max-width: 768px) {
-    /* 1. It stops the whole screen from shaking left/right */
+    /* 1. Stop the whole screen from shaking left/right */
     body {
         overflow-x: hidden;
         padding: 10px !important;
     }
 
-.date-input {
-    width: 118px !important;    
-    padding-right: 0px !important; 
-    letter-spacing: 0px !important; 
+    .date-input {
+    width: 118px !important;      /* Increased further */
+    padding-right: 0px !important; /* Removed right padding to give the '6' space */
+    letter-spacing: 0px !important; /* Resetting spacing just for this box */
 }
 
-    /* 2. here it prevents it from squishing */
+    /* 2. Fix the Table: Prevent it from squishing */
     table {
         min-width: 600px !important; /* Forces the columns to stay readable */
     }
 
-    /* 3. Following will make the Table Swipeable */
+    /* 3. Make the Table Swipeable */
     .overflow-x-auto {
         display: block;
         width: 100%;
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
+        -webkit-overflow-scrolling: touch; /* Smooth swipe on iPhone */
         border: 1px solid #2d2d35;
     }
 
-    /* 4. It will shrink the header text slightly for small phones */
+    /* 4. Shrink the header text slightly for small phones */
     h1 {
         font-size: 1rem !important;
     }
+}
+
+/* MOBILE SWIPE ANIMATION */
+@keyframes swipe-hint {
+    0% { transform: translateX(0); opacity: 0.5; }
+    50% { transform: translateX(-10px); opacity: 1; }
+    100% { transform: translateX(0); opacity: 0.5; }
+}
+.animate-swipe {
+    animation: swipe-hint 1.5s infinite ease-in-out;
 }
