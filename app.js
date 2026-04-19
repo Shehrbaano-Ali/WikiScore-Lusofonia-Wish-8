@@ -1,4 +1,3 @@
-// 1. CONFIG
 const PROXY = "https://corsproxy.io/?"; 
 const badgeRules = [
     { pts: 50,   img: "badge_50.jpg",   rank: "Level 1" },
@@ -9,7 +8,7 @@ const badgeRules = [
     { pts: 3000, img: "badge_3000.png", rank: "Level 6" }
 ];
 
-// RESTORED: FULL LIST OF PARTICIPANTS (Offline Safety Net)
+// BELOW IS THE FULL LIST OF PARTICIPANTS
 const backupList = [
     { name: "Aleksey Bolger" }, { name: "Alethos2026" }, { name: "AmandaLDS" },
     { name: "Ana Beatriz Valenza de Oliveira" }, { name: "Ana Clara Ozório" },
@@ -191,7 +190,7 @@ function renderTable() {
     `).join('');
 }
 
-// NEW: EXTRAORDINARY FORCE SYNC
+// BELOW IS THE FORCE SYNC
 function forceSync() {
     console.log("LOG: INITIATING_FORCE_SYNC...");
     localStorage.removeItem('cached_participants');
@@ -200,7 +199,7 @@ function forceSync() {
 
 async function harvestData(slug, isForced = false) {
     try {
-        // Cache-Busting: Ensures we get the REAL list, not a saved version
+        // Here I Ensured we get the REAL list, not a saved version
         const cacheBuster = isForced ? `?t=${Date.now()}` : '';
         const url = `https://outreachdashboard.wmflabs.org/courses/${slug}/users.json${cacheBuster}`;
         
