@@ -73,7 +73,7 @@ I built this prototype from scratch to be a full-stack answer. It features a rea
 
 To ensure the engine is both fair and precise, I have implemented a weighted scoring algorithm:  
 
-## $$\text{Total Score} = \sum (\text{Labels} \times w_L) + (\text{Desc} \times w_D) + (\text{Facts} \times w_F) + (\text{Ref} \times w_R) + (\text{Img} \times w_I)$$  
+### $$\text{Total Score} = \sum (\text{Labels} \times w_L) + (\text{Desc} \times w_D) + (\text{Facts} \times w_F) + (\text{Ref} \times w_R) + (\text{Img} \times w_I)$$  
 
 This allows the community to prioritize high-value edits (like References, labels, images etc) while still rewarding all forms of contribution.
 
