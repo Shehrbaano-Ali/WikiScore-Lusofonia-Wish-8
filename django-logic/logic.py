@@ -3,12 +3,11 @@ import re
 from django.core.management.base import BaseCommand
 from .models import WikidataContribution, Contest, Participant
 
-# 🚨 CHANGED TO A DJANGO MANAGEMENT COMMAND 🚨
 class Command(BaseCommand):
     help = 'Fetches and scores Wikidata contributions for active contests'
 
     def handle(self, *args, **options):
-        # 1. We grab all active contests from the House
+        # 1. It grabs all active contests from the system
         contests = Contest.objects.filter(is_active=True)
         
         for contest in contests:
@@ -17,7 +16,7 @@ class Command(BaseCommand):
                 self.audit_and_score(participant, contest)
 
     def audit_and_score(self, participant, contest):
-        # These are your exact weights
+        # These are my exact weights
         weights = {'label': 2, 'description': 3, 'fact': 5, 'reference': 4, 'image': 5}
         api_url = "https://www.wikidata.org/w/api.php"
 
@@ -43,10 +42,10 @@ class Command(BaseCommand):
             comment = edit.get('comment', '')
             revid = edit.get('revid')
             
-            # 2. PT Tag Check (Your superior logic!)
+            # 2. PT Tag Check
             is_pt = bool(re.search(r'\|pt', comment))
             
-            # 3. Action Matching
+            # 3. Here is the Action Matching
             points = 0
             action = "other"
 
@@ -61,12 +60,12 @@ class Command(BaseCommand):
             elif 'wbsetreference-add' in comment:
                 points, action = weights['reference'], "Reference"
 
-            # 4. Save to the permanent record, now linked to the House
+            # 4. it will save the data into the permanent record and link it to the sytem
             WikidataContribution.objects.update_or_create(
-                contest=contest, # 🚨 Added Link
+                contest=contest, # Link added
                 revid=revid,
                 defaults={
-                    'participant': participant, # 🚨 Added Link
+                    'participant': participant, # Link added
                     'timestamp': edit['timestamp'],
                     'is_portuguese': is_pt,
                     'action_type': action,
