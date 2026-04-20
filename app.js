@@ -306,20 +306,27 @@ function showNameTooltip(event, name) {
     }, 2000);
 }
 
-// HIDE SWIPE HINT ON SCROLL
-const scrollContainer = document.querySelector('.overflow-x-auto');
-const swipeHint = document.getElementById('swipe-hint');
 
-if (scrollContainer && swipeHint) {
-    scrollContainer.addEventListener('scroll', () => {
-        // If user swiped more than 20px to the right, hide it
-        if (scrollContainer.scrollLeft > 20) {
-            swipeHint.style.opacity = '0';
-            swipeHint.style.pointerEvents = 'none';
-        } else {
-            // If they are back at the start (0px), show it again
-            swipeHint.style.opacity = '1';
-            swipeHint.style.pointerEvents = 'auto';
-        }
-    });
+// --- FORCE SCROLL WATCHER ---
+function initScrollWatcher() {
+    const container = document.getElementById('table-scroll-zone');
+    const hint = document.getElementById('swipe-hint');
+
+    if (container && hint) {
+        container.onscroll = function() {
+            // If user swiped more than 30px to the right, hide it
+            if (container.scrollLeft > 30) {
+                hint.style.opacity = "0";
+                hint.style.pointerEvents = "none";
+            } else {
+                // If they are back at the start (0px), show it again
+                hint.style.opacity = "1";
+                hint.style.pointerEvents = "auto";
+            }
+        };
+    } else {
+        // If the table isn't ready yet, check again in a split second
+        setTimeout(initScrollWatcher, 300);
+    }
 }
+initScrollWatcher();
