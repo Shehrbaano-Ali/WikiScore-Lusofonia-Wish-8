@@ -17,7 +17,7 @@
 ---
 ## 📸 Visual Overview
 
-### 1. Visual representation of my prototype
+### 1. Visual representation of wikiscore
 
 ![View](my-prototype.png)
 
@@ -28,6 +28,7 @@
 - [Introduction](#introduction)
 - [Objectives](#objectives)
 - [Technical Steps & Implementation](#technical-steps--implementation)
+- [📱Mobile Adaptation & UX Polishing](#mobile-adaptation--ux-polishing)
 - [API & Retrieval (RAG Principles)](#api--retrieval-rag-principles)
 - [Speed & Traffic Control (Parallel Processing)](#speed--traffic-control-parallel-processing)
 - [The Professional Organizer Tools](#the-professional-organizer-tools)
@@ -64,6 +65,16 @@ I broke down a user's work into 5 specific categories: `*Labels (L), Description
 
 **5. Healthy Competition *(Badges):***
 I used badgeRules and renderLegend to create a *Ranking System* from `Level 1 to Level 6`. These aren't just pictures; I created these badges to make editors feel like they are leveling up in a game. It turns a boring task into a fun, healthy competition.
+
+---
+
+## 📱Mobile Adaptation & UX Polishing
+A professional tool must be accessible. I implemented specific mobile-first logic to ensure the terminal remains functional on small screens:  
+
+1. Implemented a swipeable table logicnthat keeps the data-heavy leaderboard readable on mobile without squishing columns.
+2. I created a *Swipe to see scores* hint that only appears on mobile.
+3. Since mobile devices lack hover states, I built a custom `showNameTooltip` function. When a truncated username is tapped, a subtle terminal-style popup appears to show the full ID before fading away.
+4. Utilized Tailwind md: prefixes to ensure the layout snaps from a tight mobile view to a wide, balanced desktop sequence automatically.
 
 ---
 ## API & Retrieval (RAG Principles)
@@ -127,6 +138,7 @@ WikiScore-Lusofonia-Wish-8/
 ## AI Usage
 I utilized Gemini for:
 * **Documentation Structure:** Organizing this README to reflect the scratch to the end analysis.
+* **Iterative Polishing:** Working through responsive CSS edge cases to ensure the sequence remained perfect on both laptop and mobile.
 
 All code, logic (PT vs GL split), and the Cache Buster fix were manually verified and implemented by me. I want to allow myself smooth reach to the Outreachy dashboard for my future work without any blockage.
 
