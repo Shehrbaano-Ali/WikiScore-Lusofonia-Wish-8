@@ -78,22 +78,31 @@ To ensure the engine is both fair and precise, I have implemented a weighted sco
 This allows the community to prioritize high-value edits (like References, labels, images etc) while still rewarding all forms of contribution.
 
 **1. The SQL and Newcomers:**  
-**i.** In my code, this is handled by models.py. For people new to coding, data usually disappears when you refresh a page. I used Django Models to create a permanent SQL Database. This means when a new person joins a contest, their name and points are saved forever on the server, not just for one session.  
+**i.** In my code, this is handled by models.py. For people new to coding, data usually disappears when you refresh a page.  
+       I used Django Models to create a permanent SQL Database. This means when a new person joins a contest, their name and points are saved forever on the server, not just for one session.  
 
 **ii.** I used BigIntegerField for IDs. Wikidata is massive, and using normal numbers eventually crashes the database.
 
 **2. The Proxy:**  
-I used const PROXY = `*https://corsproxy.io/?*`;. Sometimes websites block outside code from talking to them. I used this CORS Proxy to act as a middleman so my app can talk to Wikidata smoothly without any blockages.
+I used const PROXY = `*https://corsproxy.io/?*`;. Sometimes websites block outside code from talking to them.  
+I used this CORS Proxy to act as a middleman so my app can talk to Wikidata smoothly without any blockages.
 
 **3. Time/Dates:**  
-I didn't just hardcode a single date. I built a Time Machine feature using dateRange and updateDates(). Organizers can pick exactly when a contest starts and ends using the date inputs in the header, and the engine will only count edits from that specific time.
+I didn't just hardcode a single date. I built a Time Machine feature using dateRange and updateDates().  
+Organizers can pick exactly when a contest starts and ends using the date inputs in the header, and the engine will only count edits from that specific time.
 
 **4. The Point Breakdown:**  
-I broke down a user's work into 5 specific categories: `*Labels (L), Descriptions (D), Facts (F), References (R), and Images (I)*`. Every time a user makes an edit, the engine identifies exactly what they did and gives them the right amount of points based on my custom weights.  
+I broke down a user's work into 5 specific categories: `*Labels (L), Descriptions (D), Facts (F), References (R), and Images (I)*`.  
+Every time a user makes an edit, the engine identifies exactly what they did and gives them the right amount of points based on my custom weights.  
 
 **5. Healthy Competition *(Badges):***  
-I used badgeRules and renderLegend to create a *Ranking System* from `Level 1 to Level 6`. These aren't just pictures; I created these badges to make editors feel like they are leveling up in a game. It turns a boring task into a fun, healthy competition.  
-A contributor can edit 1,000 global items, but you only *Level Up* their badges by doing Portuguese-specific work. It keeps the focus on the mission.
+I used badgeRules and renderLegend to create a *Ranking System* from `Level 1 to Level 6`. These aren't just pictures;  
+I created these badges to make editors feel like they are leveling up in a game. It turns a boring task into a fun, healthy competition.  
+A contributor can edit 1,000 global items, but you only *Level Up* their badges by doing Portuguese-specific work. It keeps the focus on the mission.  
+
+**6. The Pagination logic:**  
+I implemented Infinite Pagination logic. The engine doesn't just scan the first few edits;  
+it uses a recursive loop to *keep flipping the page* until it finds every single contribution a user has made, even if they have thousands.
 
 
 ---
