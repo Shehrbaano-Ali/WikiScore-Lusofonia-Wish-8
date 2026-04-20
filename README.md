@@ -134,7 +134,8 @@ WikiScore-Lusofonia-Wish-8/
 ├── badge_2000.png     # Achievement asset: Level 5 
 ├── badge_3000.png     # Achievement asset: Level 6
 ├── index.html         # Terminal UI structure & Organizer dashboard
-├── my-prototype.png   # Full visual preview of the tool
+├── my-prototype.png   # Full visual preview of the tool on laptop
+├── my-prototype-mobile.png   # Full visual preview of the tool on Phone
 └── style.css          # Terminal aesthetic, animations & neon styling
 ```
 
