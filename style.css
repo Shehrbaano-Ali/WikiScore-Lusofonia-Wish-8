@@ -1,12 +1,11 @@
-/* TERMINAL LOGIC STYLING */
 body { letter-spacing: -0.02em; background-color: #0a0a0c; }
 
-/* CUSTOM SCROLLBAR */
+/* I added a custom scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #0a0a0c; }
 ::-webkit-scrollbar-thumb { background: #2d2d35; border-radius: 10px; }
 
-/* NEON STATUS LIGHT */
+/* I choose the neon status light */
 @keyframes neon-pulse {
     0% { opacity: 1; filter: brightness(1) drop-shadow(0 0 2px #00ff9d); }
     50% { opacity: 0.3; filter: brightness(0.5) drop-shadow(0 0 0px #00ff9d); }
@@ -14,12 +13,12 @@ body { letter-spacing: -0.02em; background-color: #0a0a0c; }
 }
 #status-light { animation: neon-pulse 1.2s infinite ease-in-out; }
 
-/* TABLE ROW HOVER */
+/* I set the table row hover */
 tr { transition: all 0.3s ease; height: 110px; }
 tr:hover { background-color: #1c1c22 !important; }
 tr:hover td { color: #ffffff; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
 
-/* BADGES */
+/* I customize and set the badges */
 .status-badge {
     width: 65px; height: 65px; object-fit: contain;
     background: #16161a; border: 2px solid rgba(0, 255, 157, 0.3);
@@ -80,41 +79,41 @@ tr:hover .veto-btn { opacity: 0.6; }
 .bot-tag { background-color: #ef4444; color: white; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); font-weight: 800; }
 .edit-link { opacity: 0.4; transition: opacity 0.3s; font-size: 14px; margin-left: 8px; }
 
-/* --- MOBILE RESPONSIVENESS --- */
+/* I made the system that also response to phone screens, it doesnt behave terribly when opened in phones*/
 @media (max-width: 768px) {
-    /* 1. Stop the whole screen from shaking left/right */
+    /* 1. this will stop the whole screen from shaking left to right */
     body {
         overflow-x: hidden;
         padding: 10px !important;
     }
 
     .date-input {
-    width: 118px !important;      /* Increased further */
-    padding-right: 0px !important; /* Removed right padding to give the '6' space */
-    letter-spacing: 0px !important; /* Resetting spacing just for this box */
+    width: 118px !important;      
+    padding-right: 0px !important; /* I removed right padding to give the '6' space */
+    letter-spacing: 0px !important; 
 }
 
-    /* 2. Fix the Table: Prevent it from squishing */
+    /* 2. here I fixed the table to Prevent it from squishing */
     table {
-        min-width: 600px !important; /* Forces the columns to stay readable */
+        min-width: 600px !important; /* ths code will force the columns to stay readable */
     }
 
-    /* 3. Make the Table Swipeable */
+    /* 3. below code will make the Table Swipeable */
     .overflow-x-auto {
         display: block;
         width: 100%;
         overflow-x: auto;
-        -webkit-overflow-scrolling: touch; /* Smooth swipe on iPhone */
+        -webkit-overflow-scrolling: touch; 
         border: 1px solid #2d2d35;
     }
 
-    /* 4. Shrink the header text slightly for small phones */
+    /* 4. this code will shrink the header text slightly for small phones */
     h1 {
         font-size: 1rem !important;
     }
 }
 
-/* MOBILE SWIPE ANIMATION */
+/* following codes are for mobile swipe animation */
 @keyframes swipe-hint {
     0% { transform: translateX(0); opacity: 0.5; }
     50% { transform: translateX(-10px); opacity: 1; }
@@ -129,7 +128,7 @@ tr:hover .veto-btn { opacity: 0.6; }
 .pt-tag { color: #00ff9d; font-size: 8px; border: 1px solid #00ff9d; padding: 1px 3px; border-radius: 2px; }
 .br-tag { color: #ffcc00; font-size: 8px; border: 1px solid #ffcc00; padding: 1px 3px; border-radius: 2px; }
 
-/* WARNING PULSE FOR STRICT MODE */
+/* Below is the warning given for strict mode */
 @keyframes strict-pulse {
     0% { opacity: 1; filter: brightness(1) drop-shadow(0 0 2px #ef4444); }
     50% { opacity: 0.4; filter: brightness(0.7) drop-shadow(0 0 0px #ef4444); }
