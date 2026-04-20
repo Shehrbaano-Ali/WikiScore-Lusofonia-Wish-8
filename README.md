@@ -12,7 +12,7 @@
 ---
 ## LINK
 
-### 🌐 [Click here to view the Live WikiScore](https://shehrbaano-ali.github.io/WikiScore-Lusofonia-Wish-8-/)
+### 🌐 [Click here to view the Live WikiScore](https://shehrbaano-ali.github.io/WikiScore-Lusofonia-Wish-8/)
 
 ---
 ## 📸 Visual Overview
