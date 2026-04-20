@@ -1,4 +1,3 @@
-// 1. CONFIG
 const PROXY = "https://corsproxy.io/?"; 
 const badgeRules = [
     { pts: 25,   img: "badge_50.jpg",   rank: "Level 1" },
@@ -8,6 +7,8 @@ const badgeRules = [
     { pts: 600,  img: "badge_2000.png", rank: "Level 5" },
     { pts: 1000, img: "badge_3000.png", rank: "Level 6" }
 ];
+
+    // Below is the names list of the participants
 
 const backupList = [
     { name: "Aleksey Bolger" }, { name: "Alethos2026" }, { name: "AmandaLDS" },
@@ -80,7 +81,7 @@ async function fetchScore(editor) {
     let uccontinue = null;
     let sPT = 0, sGL = 0, l = 0, d = 0, f = 0, r = 0, img = 0, revCount = 0;
     let botFound = false;
-    let lastItem = "---"; // 🚨 NEW: Item Tracking
+    let lastItem = "---"; // Here I added a Item Tracking
 
     try {
         while (true) {
@@ -104,7 +105,7 @@ async function fetchScore(editor) {
 
                 const c = e.comment || "";
                 
-                // 🚨 NEW: Capture the QID from the comment for the Audit Trail
+                // I captured the QID from the comment
                 const qidMatch = c.match(/Q\d+/);
                 if (qidMatch && lastItem === "---") lastItem = qidMatch[0];
 
