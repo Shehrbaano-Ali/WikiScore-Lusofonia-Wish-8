@@ -22,7 +22,7 @@
 ![View](my-prototype.png)
 
 
-### 2. On Mobile📱
+### 2. On Phone📱
 ![View](my-prototype-mobile.png)
 
 
