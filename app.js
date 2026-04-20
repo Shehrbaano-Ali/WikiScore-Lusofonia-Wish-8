@@ -1,14 +1,14 @@
+// 1. CONFIG
 const PROXY = "https://corsproxy.io/?"; 
 const badgeRules = [
-    { pts: 50,   img: "badge_50.jpg",   rank: "Level 1" },
-    { pts: 200,  img: "badge_200.jpg",  rank: "Level 2" },
-    { pts: 500,  img: "badge_500.jpg",  rank: "Level 3" },
-    { pts: 1000, img: "badge_1000.png", rank: "Level 4" },
-    { pts: 2000, img: "badge_2000.png", rank: "Level 5" },
-    { pts: 3000, img: "badge_3000.png", rank: "Level 6" }
+    { pts: 25,   img: "badge_50.jpg",   rank: "Level 1" },
+    { pts: 50,   img: "badge_200.jpg",  rank: "Level 2" },
+    { pts: 150,  img: "badge_500.jpg",  rank: "Level 3" },
+    { pts: 300,  img: "badge_1000.png", rank: "Level 4" },
+    { pts: 600,  img: "badge_2000.png", rank: "Level 5" },
+    { pts: 1000, img: "badge_3000.png", rank: "Level 6" }
 ];
 
-// Full list of participants is written below 
 const backupList = [
     { name: "Aleksey Bolger" }, { name: "Alethos2026" }, { name: "AmandaLDS" },
     { name: "Ana Beatriz Valenza de Oliveira" }, { name: "Ana Clara Ozório" },
@@ -65,9 +65,11 @@ async function validateBatch(revids) {
         const res = await fetch(PROXY + encodeURIComponent(url));
         const data = await res.json();
         const validityMap = {};
-        Object.values(data.query.pages).forEach(p => {
-            if (p.revisions) p.revisions.forEach(r => validityMap[r.revid] = !r.tags.includes('mw-reverted'));
-        });
+        if (data.query && data.query.pages) {
+            Object.values(data.query.pages).forEach(p => {
+                if (p.revisions) p.revisions.forEach(r => validityMap[r.revid] = !r.tags.includes('mw-reverted'));
+            });
+        }
         return validityMap;
     } catch { return {}; }
 }
@@ -75,44 +77,64 @@ async function validateBatch(revids) {
 async function fetchScore(editor) {
     const apiStart = `${dateRange.end}T23:59:59Z`;
     const apiEnd = `${dateRange.start}T00:00:00Z`;
-    const url = `https://www.wikidata.org/w/api.php?action=query&list=usercontribs&ucuser=${encodeURIComponent(editor.name)}&ucstart=${apiStart}&ucend=${apiEnd}&uclimit=500&ucprop=comment|ids|flags&format=json&origin=*`;
-    
+    let uccontinue = null;
+    let sPT = 0, sGL = 0, l = 0, d = 0, f = 0, r = 0, img = 0, revCount = 0;
+    let botFound = false;
+    let lastItem = "---"; // 🚨 NEW: Item Tracking
+
     try {
-        const res = await fetch(PROXY + encodeURIComponent(url));
-        const data = await res.json();
-        const edits = data.query.usercontribs || [];
-        const allIds = edits.map(e => e.revid);
-        let validityMap = {};
-        for (let i = 0; i < allIds.length; i += 50) {
-            const result = await validateBatch(allIds.slice(i, i + 50));
-            validityMap = { ...validityMap, ...result };
+        while (true) {
+            let url = `https://www.wikidata.org/w/api.php?action=query&list=usercontribs&ucuser=${encodeURIComponent(editor.name)}&ucstart=${apiStart}&ucend=${apiEnd}&uclimit=500&ucprop=comment|ids|flags&format=json&origin=*`;
+            if (uccontinue) url += `&uccontinue=${uccontinue}`;
+
+            const res = await fetch(PROXY + encodeURIComponent(url));
+            const data = await res.json();
+            const edits = data.query.usercontribs || [];
+            
+            const allIds = edits.map(e => e.revid);
+            let validityMap = {};
+            for (let i = 0; i < allIds.length; i += 50) {
+                const result = await validateBatch(allIds.slice(i, i + 50));
+                validityMap = { ...validityMap, ...result };
+            }
+
+            edits.forEach(e => {
+                if (e.hasOwnProperty('bot')) { botFound = true; return; }
+                if (validityMap[e.revid] === false) { revCount++; return; }
+
+                const c = e.comment || "";
+                
+                // 🚨 NEW: Capture the QID from the comment for the Audit Trail
+                const qidMatch = c.match(/Q\d+/);
+                if (qidMatch && lastItem === "---") lastItem = qidMatch[0];
+
+                const isPtDialect = /\|pt(-br)?/.test(c);
+
+                if (c.includes('P18')) { sGL += weights.i; img++; }
+                else if (c.includes('wbsetclaim-create')) { sGL += weights.f; f++; }
+                else if (c.includes('wbsetreference-add')) { sGL += weights.r; r++; }
+                else if (c.includes('wbsetlabel')) {
+                    if (isPtDialect) { sPT += weights.l; l++; }
+                    else { sGL += weights.l; l++; }
+                }
+                else if (c.includes('wbsetdescription')) {
+                    if (isPtDialect) { sPT += weights.d; d++; }
+                    else { sGL += weights.d; d++; }
+                }
+            });
+
+            if (data.continue && data.continue.uccontinue) {
+                uccontinue = data.continue.uccontinue;
+            } else {
+                break;
+            }
         }
-
-        let sPT = 0, sGL = 0, l = 0, d = 0, f = 0, r = 0, img = 0, revCount = 0;
-        let botFound = false;
-
-        edits.forEach(e => {
-            if (e.hasOwnProperty('bot')) { botFound = true; return; }
-            if (validityMap[e.revid] === false) { revCount++; return; }
-
-            const c = e.comment || "";
-            if (c.includes('P18')) { sGL += weights.i; img++; }
-            else if (c.includes('wbsetclaim-create')) { sGL += weights.f; f++; }
-            else if (c.includes('wbsetreference-add')) { sGL += weights.r; r++; }
-            else if (c.includes('wbsetlabel')) {
-                if (c.includes('|pt')) { sPT += weights.l; l++; }
-                else { sGL += weights.l; l++; }
-            }
-            else if (c.includes('wbsetdescription')) {
-                if (c.includes('|pt')) { sPT += weights.d; d++; }
-                else { sGL += weights.d; d++; }
-            }
-        });
 
         editor.scorePT = sPT; editor.scoreGL = sGL;
         editor.score = sPT + sGL; editor.reverts = revCount; editor.isBot = botFound;
+        editor.lastItem = lastItem; // 🚨 NEW: Store tracked item
         editor.workBreakdown = `${l}L / ${d}D / ${f}F / ${r}R / ${img}i`;
-        editor.earnedBadges = getEarnedBadges(editor.score);
+        editor.earnedBadges = getEarnedBadges(editor.scorePT);
         
         updateMissionStats(); 
         renderTable();
@@ -167,17 +189,13 @@ function renderTable() {
     tbody.innerHTML = sorted.filter(p => p.name.toLowerCase().includes(filter)).map(p => `
         <tr class="border-b border-[#2d2d35] ${p.isVetoed ? 'grayscale' : ''}">
             <td class="pl-3 md:pl-6 pr-2 py-4 text-white font-bold flex items-center gap-1 md:gap-2 w-[130px] md:w-[180px]">
-                <span class="truncate cursor-help" 
-                      onclick="showNameTooltip(event, '${p.name}')">
-                    ${p.name}
-                </span>
+                <span class="truncate cursor-help" onclick="showNameTooltip(event, '${p.name}')">${p.name}</span>
                 ${(p.isBot && showBots) ? '<span class="bot-tag px-1 py-0.5 rounded ml-2">BOT</span>' : ''}
                 <div class="flex gap-1 md:gap-2 ml-auto">
                     <a href="https://www.wikidata.org/wiki/Special:Contributions/${encodeURIComponent(p.name)}" target="_blank" class="edit-link">🔗</a>
                     <button onclick="toggleVeto('${p.name}')" class="veto-btn ${p.isVetoed ? 'veto-active' : ''}">🚫</button>
                 </div>
             </td>
-
             <td class="px-2 py-4 text-center">
                 <div class="flex items-center justify-center -space-x-3 mx-auto w-fit">
                     ${p.earnedBadges.map(b => `
@@ -188,7 +206,6 @@ function renderTable() {
                     `).join('')}
                 </div>
             </td>
-
             <td class="px-6 py-4 font-mono">
                 <div class="text-xl font-bold text-[#ef4444] ${p.isVetoed ? 'line-through' : ''}">${p.score}</div>
                 <div class="score-meta text-[#64748b]">
@@ -196,47 +213,45 @@ function renderTable() {
                     GL: <span class="text-[#38bdf8]">${p.scoreGL || 0}</span>
                 </div>
             </td>
-
             <td class="px-6 py-4 text-[#38bdf8] text-[10px] font-mono">
                 ${p.workBreakdown}
+
+                <div class="mt-1 flex items-center gap-1 opacity-80">
+                    <span class="text-[8px] text-[#64748b]">LAST_TRACKED:</span>
+                    ${p.lastItem !== "---" 
+                        ? `<a href="https://www.wikidata.org/wiki/${p.lastItem}" target="_blank" class="text-[#00ff9d] hover:underline underline-offset-2">${p.lastItem}</a>` 
+                        : `<span class="text-[#64748b]">NONE</span>`}
+                </div>
+
                 ${(showBots && p.reverts > 0) ? `<span class="revert-subtle ml-2">(${p.reverts} reverted)</span>` : ''}
             </td>
         </tr>
     `).join('');
 }
 
-// Here I used the force sync to refresh the page and give us latest data
 function forceSync() {
-    console.log("LOG: INITIATING_FORCE_SYNC...");
     localStorage.removeItem('cached_participants');
     harvestData("WMB/Cada_Livro_Seu_Público_2026_-_edite_sobre_livros_e_autores_na_Wikipédia", true);
 }
 
 async function harvestData(slug, isForced = false) {
     try {
-         // cache busting ensures user will get the live list instead of already saved list
         const cacheBuster = isForced ? `?t=${Date.now()}` : '';
         const url = `https://outreachdashboard.wmflabs.org/courses/${slug}/users.json${cacheBuster}`;
-        
         const res = await fetch(PROXY + encodeURIComponent(url));
         const data = await res.json();
-        
         const liveUsers = (data.course ? data.course.users : data.users).map(u => ({
             name: u.username.replace(/\s*\(WMB\)\s*/g, "").trim(),
-            score: 0, scorePT: 0, scoreGL: 0, reverts: 0, workBreakdown: "QUEUED", earnedBadges: [], isBot: false, isVetoed: false
+            score: 0, scorePT: 0, scoreGL: 0, reverts: 0, workBreakdown: "QUEUED", lastItem: "---", earnedBadges: [], isBot: false, isVetoed: false
         }));
-
         localStorage.setItem('cached_participants', JSON.stringify(liveUsers));
         participants = liveUsers;
-        console.log("LOG: LIVE_SYNC_COMPLETE. USER_DATABASE_SYNCHRONIZED.");
-
     } catch (err) {
         const cached = localStorage.getItem('cached_participants');
         if (cached) {
             participants = JSON.parse(cached);
-            console.log("LOG: API_OFFLINE. LOADING_CACHED_VAULT.");
         } else {
-            participants = backupList.map(p => ({ ...p, score: 0, scorePT: 0, scoreGL: 0, reverts: 0, workBreakdown: "OFFLINE", earnedBadges: [], isBot: false, isVetoed: false }));
+            participants = backupList.map(p => ({ ...p, score: 0, scorePT: 0, scoreGL: 0, reverts: 0, workBreakdown: "OFFLINE", lastItem: "---", earnedBadges: [], isBot: false, isVetoed: false }));
         }
     }
     renderTable();
@@ -244,9 +259,9 @@ async function harvestData(slug, isForced = false) {
 }
 
 function downloadCSV() {
-    let csv = "data:text/csv;charset=utf-8,Rank,Username,Status,Breakdown,ScorePT,ScoreGL,TotalScore\n";
+    let csv = "data:text/csv;charset=utf-8,Rank,Username,Status,Breakdown,LastQID,ScorePT,ScoreGL,TotalScore\n";
     [...participants].sort((a,b) => b.score - a.score).forEach((p, i) => {
-        csv += `${i+1},"${p.name}",${p.isVetoed ? 'VETOED' : 'ACTIVE'},"${p.workBreakdown}",${p.scorePT},${p.scoreGL},${p.score}\n`;
+        csv += `${i+1},"${p.name}",${p.isVetoed ? 'VETOED' : 'ACTIVE'},"${p.workBreakdown}","${p.lastItem}",${p.scorePT},${p.scoreGL},${p.score}\n`;
     });
     const link = document.createElement("a");
     link.href = encodeURI(csv); link.download = `WikiScore_Mission_Report.csv`; link.click();
@@ -280,52 +295,26 @@ renderLegend();
 harvestData("WMB/Cada_Livro_Seu_Público_2026_-_edite_sobre_livros_e_autores_na_Wikipédia");
 
 function showNameTooltip(event, name) {
-    // It will remove any existing tooltip first
     const existing = document.getElementById('temp-tooltip');
     if (existing) existing.remove();
-
-    // it will help us create a tiny ghost tooltip
     const tip = document.createElement('div');
     tip.id = 'temp-tooltip';
     tip.innerText = name;
-    
-    // following styling it to look like a small, clean terminal popup
-    tip.className = "fixed bg-[#0a0a0c] border border-[#38bdf8] text-[#38bdf8] text-[10px] px-2 py-1 rounded shadow-2xl z-[9999] pointer-events-none font-mono uppercase tracking-tighter animate-fade-in";
-    
-    // It will position it right where we will tap
+    tip.className = "fixed bg-[#0a0a0c] border border-[#38bdf8] text-[#38bdf8] text-[10px] px-2 py-1 rounded shadow-2xl z-[9999] pointer-events-none font-mono uppercase animate-fade-in";
     tip.style.left = `${event.clientX}px`;
     tip.style.top = `${event.clientY - 30}px`;
-
     document.body.appendChild(tip);
-
-    // Following code will make it disappear after 2 seconds
-    setTimeout(() => {
-        tip.classList.add('opacity-0');
-        setTimeout(() => tip.remove(), 500);
-    }, 2000);
+    setTimeout(() => { tip.classList.add('opacity-0'); setTimeout(() => tip.remove(), 500); }, 2000);
 }
 
-
-// Her I used Force scroll Watcher
 function initScrollWatcher() {
     const container = document.getElementById('table-scroll-zone');
     const hint = document.getElementById('swipe-hint');
-
     if (container && hint) {
         container.onscroll = function() {
-            // If user swiped more than 30px to the right, below code will hide it
-            if (container.scrollLeft > 30) {
-                hint.style.opacity = "0";
-                hint.style.pointerEvents = "none";
-            } else {
-                // If they are back at the start (0px), it will show it again
-                hint.style.opacity = "1";
-                hint.style.pointerEvents = "auto";
-            }
+            if (container.scrollLeft > 30) { hint.style.opacity = "0"; hint.style.pointerEvents = "none"; }
+            else { hint.style.opacity = "1"; hint.style.pointerEvents = "auto"; }
         };
-    } else {
-        // If the table isn't ready yet, check again in a split second
-        setTimeout(initScrollWatcher, 300);
-    }
+    } else { setTimeout(initScrollWatcher, 300); }
 }
 initScrollWatcher();
