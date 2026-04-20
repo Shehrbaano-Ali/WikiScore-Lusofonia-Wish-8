@@ -31,6 +31,7 @@
 
 - [Introduction](#introduction)
 - [Objectives](#objectives)
+- [Three Super Visual Features](#three-super-visual-features)
 - [Technical Steps & Implementation](#technical-steps--implementation)
 - [📱Mobile Adaptation & UX Polishing](#mobile-adaptation--ux-polishing)
 - [API & Retrieval (RAG Principles)](#api--retrieval-rag-principles)
@@ -64,7 +65,8 @@ I built this prototype from scratch to be a full-stack answer. It features a rea
 ## Three Super Visual Features  
 1. The terminal identifies Continental vs. Brazilian edits instantly. It’s not just a counter; it’s culturally aware.
 2. I added a glowing Red Status Light 🔴. When it's on, it means the Anti-Cheat protocol is live and the engine is only awarding points for Targeted Items.
-3. Transparency is everything. I display the Item ID (QID) and the raw Edit Comment for every single score so organizers can verify the work in one second.
+3. I added a *LAST_TRACKED QID* for every participant. Organizers shouldn't have to guess where points come from;
+   they can now tap the specific Item ID `(like Q1622272)` to see the exact Wikidata page being improved. 
 
 ---
 ## Technical Steps & Implementation
