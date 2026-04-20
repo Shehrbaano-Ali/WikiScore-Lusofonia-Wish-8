@@ -5,8 +5,8 @@ class WikidataContribution(models.Model):
     The permanent storage for Wikidata scores. 
     This is the 'Vault' that stores the math from logic.py.
     """
-    # 🚨 ADDED THESE TWO BRIDGES (ForeignKeys) 🚨
-    # This links your data directly to the existing WikiScore tables
+
+    # This code will links my data directly to the existing WikiScore tables
     contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
     participant = models.ForeignKey('Participant', on_delete=models.CASCADE)
     
@@ -14,7 +14,7 @@ class WikidataContribution(models.Model):
     timestamp = models.DateTimeField()
     
     # logic of PT vs GL
-    # This separates the 'Linguistic' work from the 'Global' technical work
+    # This code will help out to separates the Linguistic work from the Global technical work
     is_portuguese = models.BooleanField(default=False)
     
     # below is the categorization of the edit
@@ -22,7 +22,7 @@ class WikidataContribution(models.Model):
     points = models.IntegerField(default=0)
 
     class Meta:
-        # Updated to ensure uniqueness per contest, not just overall
+        # I updated to ensure uniqueness per contest, not just overall
         unique_together = ('contest', 'revid')
         verbose_name = "Wikidata Contribution"
 
