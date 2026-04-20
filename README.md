@@ -107,13 +107,16 @@ I added three critical tools that make this a professional system for organizers
 
 ## Python & Django Logic
 
-I designed the backend logic to integrate seamlessly into the existing WikiScore environment without requiring structural rewrites.  
+I designed the backend logic to integrate seamlessly into the existing WikiScore environment without requiring structural rewrites.
 
-I provided two extra files to make sure this fits perfectly into the real WikiScore system:
+1. **`models.py`:** Unlike generic implementations, I used `BigIntegerField` for revision IDs to prevent system crashes as Wikidata grows.
+   It includes an **Audit Trail** (storing the raw `comment`) and **Item Tracking** (storing the specific `QID`), ensuring 100% transparency if a score is disputed.
+3. **`logic.py`:** Packaged as a standard **Django Management Command**. It can be added to the existing `update.py` pipeline with a single line. 
+4. Specifically for Wish #8, my regex engine `r'\|pt(-br)?'` is designed to detect both **Portuguese (pt)** and **Brazilian Portuguese (pt-br)** edits. This ensures no Lusophone editor is left behind.
+5. I implemented a `WikidataPointRule` model and contest-level switches (`wikidata_enabled`, `wikidata_exclude_bots`, `wikidata_linked_only`) so organizers can customize the strictness of the contest from the Django Admin panel.
+6. Once stored, points are added to the grand total via a one-line update to the `CounterHandler` method:
+   `wikidata_points = sum(edit.points for edit in WikidataContribution.objects.filter(participant=user, is_portuguese=True))`
 
-1. **`models.py`:** The database architecture doesn't just store data in isolation. I structured it using standard `ForeignKey` relationships to build direct bridges to WikiScore's existing `Contest` and `Participant` models.
-This ensures every Wikidata score is permanently linked to the right user and the right event natively.
-2. **`logic.py`:** Instead of a random script, I packaged the scoring math, the PT-Filter, and the action matching logic as a standard **Django Management Command**.
 
 ```
 Question:
