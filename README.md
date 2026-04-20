@@ -47,27 +47,27 @@ I built this prototype from scratch to be a full-stack answer. It features a rea
 
 ---
 ## Objectives
-**1. Linguistic Precision:** Automatically identify and score Portuguese edits `(|pt)`.  
-**2. Data Integrity:** Use a Bot-Shield and Revert-Validator to ensure only authentic work counts.  
-**3. High Performance:** Use parallel processing to scan 100+ participants in seconds.  
-**4. Permanent Storage:** Use SQL-based models so contest data is never lost.  
-**5. Community Engagement:** Use a badge-based ranking system for healthy competition.
+1. For the *Precision* model will automatically identify and score Portuguese edits `(|pt)`.  
+2. Use a `Bot-Shield` and `Revert-Validator` to ensure only authentic work counts.  
+3. For *High Performance* use parallel processing to scan 100+ participants in seconds.  
+4. For *Permanent Storage* use SQL-based models so contest data is never lost.  
+5. For the *Healthy Competition* use a badge-based ranking system.
 
 ---
 ## Technical Steps & Implementation
-**1. The SQL and Newcomers:**
+**1. The SQL and Newcomers:**  
 In my code, this is handled by models.py. For people new to coding, data usually disappears when you refresh a page. I used Django Models to create a permanent SQL Database. This means when a new person joins a contest, their name and points are saved forever on the server, not just for one session.
 
-**2. The Proxy:**
+**2. The Proxy:**  
 I used const PROXY = `*https://corsproxy.io/?*`;. Sometimes websites block outside code from talking to them. I used this CORS Proxy to act as a middleman so my app can talk to Wikidata smoothly without any blockages.
 
-**3. Time/Dates:**
+**3. Time/Dates:**  
 I didn't just hardcode a single date. I built a Time Machine feature using dateRange and updateDates(). Organizers can pick exactly when a contest starts and ends using the date inputs in the header, and the engine will only count edits from that specific time.
 
-**4. The Point Breakdown:**
+**4. The Point Breakdown:**  
 I broke down a user's work into 5 specific categories: `*Labels (L), Descriptions (D), Facts (F), References (R), and Images (I)*`. Every time a user makes an edit, the engine identifies exactly what they did and gives them the right amount of points based on my custom weights.
 
-**5. Healthy Competition *(Badges):***
+**5. Healthy Competition *(Badges):***  
 I used badgeRules and renderLegend to create a *Ranking System* from `Level 1 to Level 6`. These aren't just pictures; I created these badges to make editors feel like they are leveling up in a game. It turns a boring task into a fun, healthy competition.
 
 ---
@@ -82,11 +82,13 @@ A professional tool must be accessible. I implemented specific mobile-first logi
 
 ---
 ## API & Retrieval (RAG Principles)
-In my code, this lives in `harvestData` and `fetchScore`. I used the core principles of Data Retrieval that is the same logic used in RAG (Retrieval-Augmented Generation) systems to build a high performance API engine that pulls authentic data from Wikidata. My app *retrieves* raw, authentic data directly from the Wikidata API, behaving like a specialized search engine that only looks for contest data.
+In my code, this lives in `harvestData` and `fetchScore`. I used the core principles of Data Retrieval that is the same logic used in RAG (Retrieval-Augmented Generation) systems to build a high performance API engine that pulls authentic data from Wikidata.  
+My app *retrieves* raw, authentic data directly from the Wikidata API, behaving like a specialized search engine that only looks for contest data.
 
 ---
 ## Speed & Traffic Control (Parallel Processing)
-Scanning 100 users one by one takes forever. I set the `CONCURRENCY_LIMIT = 20 `. This means the app scans 20 users at the same time. To prevent traffic jams (crashing the API), I added **throttling** so it only handles a safe amount of data at once. Every new edit found will show up in the frontend in real-time.
+Scanning 100 users one by one takes forever. I set the `CONCURRENCY_LIMIT = 20 `. This means the app scans 20 users at the same time. To prevent traffic jams (crashing the API), I added **throttling** so it only handles a safe amount of data at once.  
+Every new edit found will show up in the frontend in real-time.
 
 
 ---
@@ -94,25 +96,41 @@ Scanning 100 users one by one takes forever. I set the `CONCURRENCY_LIMIT = 20 `
 
 I added three critical tools that make this a professional system for organizers:
 
-**1. Export to CSV:** A button that turns the leaderboard into a file so organizers can report results to the Wikimedia Foundation easily.  
-**2. Bot-Shield:** A Security Guard that checks `e.hasOwnProperty('bot')` and ignores automated edits to keep the data authentic.  
-**3. Organizer's Veto:** A *Disqualify* (🚫) button. If someone is cheating, the organizer can *gray them out* and remove their points with one click.  
-**4. Transparency:** I added direct links to the raw data. If an organizer wants to check a score, they can touch the chain icon and see the user's actual Wikidata contributions instantly.
+**1.** A button *Export to CSV* turns the leaderboard into a file so organizers can report results to the Wikimedia Foundation easily.  
+**2.** A *Bot-Shield* is a security guard that checks `e.hasOwnProperty('bot')` and ignores automated edits to keep the data authentic.  
+**3.** A *Disqualify* (🚫) button. If someone is cheating, the organizer can *gray them out* and remove their points with one click.  
+**4.** I added direct links to the raw data. If an organizer wants to check a score, they can touch the chain icon and see the user's actual Wikidata contributions instantly.
 
 ---
 
-## Python & Django Logic
+### Python & Django Logic
 
-I provided two extra files to make sure this integrates into the real WikiScore environment:
+I designed the backend logic to integrate seamlessly into the existing WikiScore environment without requiring structural rewrites.  
 
-`1. models.py:` The database architecture that creates the permanent table for scores.
+I provided two extra files to make sure this fits perfectly into the real WikiScore system:
 
-`2. logic.py:` The Invisible Worker that runs on the server. It does the exact same math as my `app.js` but in Python, including my PT-Filter and point weights.
+1. **`models.py`:** The database architecture doesn't just store data in isolation. I structured it using standard `ForeignKey` relationships to build direct bridges to WikiScore's existing `Contest` and `Participant` models.
+This ensures every Wikidata score is permanently linked to the right user and the right event natively.
+2. **`logic.py`:** Instead of a random script, I packaged the scoring math, the PT-Filter, and the action matching logic as a standard **Django Management Command**.
 
+```
+Question:
+How to use it in the existing system? 
+
+Answer:
+Because `logic.py` is built as a management command, maintainers can plug it directly into the current update pipeline.
+They can simply add `load_wikidata` to the existing `update.py` sequence (right alongside `load_edits` and `load_users`).  
+* The engine will wake up  
+* Read the active contests  
+* Fetch the Wikidata contributions  
+* Filter out the bots  
+* Log the scores directly into the database
+```
 ---
 
 ## Note
 *Organizers can make the competition tough by changing the points on badges in the UI, because I made the system fully editable.*  
+
 `I hope this prototype demonstrates my technical potential. I would appreciate more direct access to the Outreachy Dashboard systems in the future so I can build tools that run even smoother, without any API or caching blockages.`
 
 ---
@@ -142,8 +160,8 @@ WikiScore-Lusofonia-Wish-8/
 ---
 ## AI Usage
 I utilized Gemini for:
-* **Documentation Structure:** Organizing this README to reflect the scratch to the end analysis.
-* **Iterative Polishing:** Working through responsive CSS edge cases to ensure the sequence remained perfect on both laptop and mobile.
+* Organizing this README to reflect my scratch to the end analysis.
+* Working through responsive CSS edge cases to ensure the sequence remained perfect on both laptop and mobile.
 
 All code, logic (PT vs GL split), and the Cache Buster fix were manually verified and implemented by me. I want to allow myself smooth reach to the Outreachy dashboard for my future work without any blockage.
 
