@@ -50,7 +50,7 @@ I built this prototype from scratch to be a full-stack answer. It features a rea
 
 ---
 ## Objectives
-1. The *Precision model* automatically identifies and score Portuguese edits `(|pt)`.  
+1. The *Precision model* automatically identifies and scores Portuguese edits `(|pt)`.  
 2. Use a `Bot-Shield` and `Revert-Validator` to ensure only authentic work counts.  
 3. For *High Performance* use parallel processing to scan 100+ participants in seconds.  
 4. For *Permanent Storage* use SQL-based models so contest data is never lost.  
