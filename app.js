@@ -1,4 +1,3 @@
-// 1. CONFIG
 const PROXY = "https://corsproxy.io/?"; 
 const badgeRules = [
     { pts: 50,   img: "badge_50.jpg",   rank: "Level 1" },
@@ -9,7 +8,7 @@ const badgeRules = [
     { pts: 3000, img: "badge_3000.png", rank: "Level 6" }
 ];
 
-// RESTORED: FULL LIST OF PARTICIPANTS (Offline Safety Net)
+// Full list of participants is written below 
 const backupList = [
     { name: "Aleksey Bolger" }, { name: "Alethos2026" }, { name: "AmandaLDS" },
     { name: "Ana Beatriz Valenza de Oliveira" }, { name: "Ana Clara Ozório" },
@@ -206,7 +205,7 @@ function renderTable() {
     `).join('');
 }
 
-// NEW: EXTRAORDINARY FORCE SYNC
+// Here I used the force sync to refresh the page and give us latest data
 function forceSync() {
     console.log("LOG: INITIATING_FORCE_SYNC...");
     localStorage.removeItem('cached_participants');
@@ -215,7 +214,7 @@ function forceSync() {
 
 async function harvestData(slug, isForced = false) {
     try {
-        // Cache-Busting: Ensures we get the REAL list, not a saved version
+         // cache busting ensures user will get the live list instead of already saved list
         const cacheBuster = isForced ? `?t=${Date.now()}` : '';
         const url = `https://outreachdashboard.wmflabs.org/courses/${slug}/users.json${cacheBuster}`;
         
@@ -281,25 +280,25 @@ renderLegend();
 harvestData("WMB/Cada_Livro_Seu_Público_2026_-_edite_sobre_livros_e_autores_na_Wikipédia");
 
 function showNameTooltip(event, name) {
-    // Remove any existing tooltip first
+    // It will remove any existing tooltip first
     const existing = document.getElementById('temp-tooltip');
     if (existing) existing.remove();
 
-    // Create a tiny "ghost" tooltip
+    // it will help us create a tiny ghost tooltip
     const tip = document.createElement('div');
     tip.id = 'temp-tooltip';
     tip.innerText = name;
     
-    // Styling it to look like a small, clean terminal popup
+    // following styling it to look like a small, clean terminal popup
     tip.className = "fixed bg-[#0a0a0c] border border-[#38bdf8] text-[#38bdf8] text-[10px] px-2 py-1 rounded shadow-2xl z-[9999] pointer-events-none font-mono uppercase tracking-tighter animate-fade-in";
     
-    // Position it right where you tapped
+    // It will position it right where we will tap
     tip.style.left = `${event.clientX}px`;
     tip.style.top = `${event.clientY - 30}px`;
 
     document.body.appendChild(tip);
 
-    // Make it disappear after 2 seconds
+    // Following code will make it disappear after 2 seconds
     setTimeout(() => {
         tip.classList.add('opacity-0');
         setTimeout(() => tip.remove(), 500);
@@ -307,19 +306,19 @@ function showNameTooltip(event, name) {
 }
 
 
-// --- FORCE SCROLL WATCHER ---
+// Her I used Force scroll Watcher
 function initScrollWatcher() {
     const container = document.getElementById('table-scroll-zone');
     const hint = document.getElementById('swipe-hint');
 
     if (container && hint) {
         container.onscroll = function() {
-            // If user swiped more than 30px to the right, hide it
+            // If user swiped more than 30px to the right, below code will hide it
             if (container.scrollLeft > 30) {
                 hint.style.opacity = "0";
                 hint.style.pointerEvents = "none";
             } else {
-                // If they are back at the start (0px), show it again
+                // If they are back at the start (0px), it will show it again
                 hint.style.opacity = "1";
                 hint.style.pointerEvents = "auto";
             }
