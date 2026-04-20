@@ -27,7 +27,7 @@ class WikidataContribution(models.Model):
     revid = models.BigIntegerField(unique=True)
     item = models.CharField(max_length=20, null=True, blank=True) 
     
-    # 🚨 ADDED: The raw audit trail for transparency
+    # The raw audit trail for transparency
     comment = models.TextField(blank=True, default='') 
     timestamp = models.DateTimeField()
     
