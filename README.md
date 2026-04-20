@@ -17,9 +17,13 @@
 ---
 ## 📸 Visual Overview
 
-### 1. Visual representation of wikiscore
+### 1. Visual representation of Wikiscore on Laptop💻
 
 ![View](my-prototype.png)
+
+
+### 2. On Mobile📱
+![View](my-prototype-mobile.png)
 
 
 ---
