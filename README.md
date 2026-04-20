@@ -17,12 +17,12 @@
 ---
 ## 📸 Visual Overview
 
-### 1. Visual representation of Wikiscore on Laptop💻
+### 1. Visual representation of Wikiscore (Laptop View 💻)
 
 ![View](my-prototype.png)
 
 
-### 2. On Phone📱
+### 2. Phone View 📱
 ![View](my-prototype-mobile.png)
 
 
@@ -54,11 +54,24 @@ I built this prototype from scratch to be a full-stack answer. It features a rea
 3. For *High Performance* use parallel processing to scan 100+ participants in seconds.  
 4. For *Permanent Storage* use SQL-based models so contest data is never lost.  
 5. For the *Healthy Competition* use a badge-based ranking system.
+6. I didn’t just look for Portuguese. I made sure the engine catches Brazilian editors too `(pt-br)`.
+   No one in the Lusophone family gets left behind.
+7. Built a *Strict Mode* that only counts edits on the official contest list. If participant is editing random stuff just to farm points, the engine ignores it.
+8. By using Infinite Pagination, my engine keeps flipping the page until it fetches every single edit, even if a user has thousands of contributions.
+
+---
+
+## Three Super Visual Features  
+1. The terminal identifies Continental vs. Brazilian edits instantly. It’s not just a counter; it’s culturally aware.
+2. I added a glowing Red Status Light 🔴. When it's on, it means the Anti-Cheat protocol is live and the engine is only awarding points for Targeted Items.
+3. Transparency is everything. I display the Item ID (QID) and the raw Edit Comment for every single score so organizers can verify the work in one second.
 
 ---
 ## Technical Steps & Implementation
 **1. The SQL and Newcomers:**  
-In my code, this is handled by models.py. For people new to coding, data usually disappears when you refresh a page. I used Django Models to create a permanent SQL Database. This means when a new person joins a contest, their name and points are saved forever on the server, not just for one session.
+i. In my code, this is handled by models.py. For people new to coding, data usually disappears when you refresh a page. I used Django Models to create a permanent SQL Database. This means when a new person joins a contest, their name and points are saved forever on the server, not just for one session.  
+
+ii. I used BigIntegerField for IDs. Wikidata is massive, and using normal numbers eventually crashes the database.
 
 **2. The Proxy:**  
 I used const PROXY = `*https://corsproxy.io/?*`;. Sometimes websites block outside code from talking to them. I used this CORS Proxy to act as a middleman so my app can talk to Wikidata smoothly without any blockages.
@@ -67,7 +80,9 @@ I used const PROXY = `*https://corsproxy.io/?*`;. Sometimes websites block outsi
 I didn't just hardcode a single date. I built a Time Machine feature using dateRange and updateDates(). Organizers can pick exactly when a contest starts and ends using the date inputs in the header, and the engine will only count edits from that specific time.
 
 **4. The Point Breakdown:**  
-I broke down a user's work into 5 specific categories: `*Labels (L), Descriptions (D), Facts (F), References (R), and Images (I)*`. Every time a user makes an edit, the engine identifies exactly what they did and gives them the right amount of points based on my custom weights.
+i. I broke down a user's work into 5 specific categories: `*Labels (L), Descriptions (D), Facts (F), References (R), and Images (I)*`. Every time a user makes an edit, the engine identifies exactly what they did and gives them the right amount of points based on my custom weights.  
+
+ii. I changed the Badge Logic. contributor can edit 1,000 global items, but you only *Level Up* their badges by doing Portuguese-specific work. It keeps the focus on the mission.
 
 **5. Healthy Competition *(Badges):***  
 I used badgeRules and renderLegend to create a *Ranking System* from `Level 1 to Level 6`. These aren't just pictures; I created these badges to make editors feel like they are leveling up in a game. It turns a boring task into a fun, healthy competition.
@@ -116,7 +131,8 @@ I designed the backend logic to integrate seamlessly into the existing WikiScore
 5. I implemented a `WikidataPointRule` model and contest-level switches (`wikidata_enabled`, `wikidata_exclude_bots`, `wikidata_linked_only`) so organizers can customize the strictness of the contest from the Django Admin panel.
 6. Once stored, points are added to the grand total via a one-line update to the `CounterHandler` method:
    `wikidata_points = sum(edit.points for edit in WikidataContribution.objects.filter(participant=user, is_portuguese=True))`
-
+7. My regex `r'\|pt(-br)?'` is specifically tuned for **Wish #8**. It’s the difference between a generic tool and a community tool.
+8. I added a `timeout=10` and `on_delete` protection. The engine is designed to be stable, resilient, and won't hang the server if the API is slow.
 
 ```
 Question:
