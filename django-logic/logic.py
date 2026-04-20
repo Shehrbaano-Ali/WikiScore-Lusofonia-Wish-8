@@ -1,77 +1,72 @@
 import requests
 import re
-from .models import WikidataContribution
+from django.core.management.base import BaseCommand
+from .models import WikidataContribution, Contest, Participant
 
-class WikiscoreEngine:
-    """
-    The Python version of your app.js logic.
-    It fetches, filters for bots/reverts, and applies the PT/GL split.
-    """
-    def __init__(self):
-        # These are the exact weights from my JS build
-        self.weights = {
-            'label': 2,
-            'description': 3,
-            'fact': 5,
-            'reference': 4,
-            'image': 5
-        }
-        self.api_url = "https://www.wikidata.org/w/api.php"
+# 🚨 CHANGED TO A DJANGO MANAGEMENT COMMAND 🚨
+class Command(BaseCommand):
+    help = 'Fetches and scores Wikidata contributions for active contests'
 
-    def audit_and_score(self, username, start_date, end_date):
-        # here are the same parameters as my JS fetch
+    def handle(self, *args, **options):
+        # 1. We grab all active contests from the House
+        contests = Contest.objects.filter(is_active=True)
+        
+        for contest in contests:
+            participants = Participant.objects.filter(contest=contest)
+            for participant in participants:
+                self.audit_and_score(participant, contest)
+
+    def audit_and_score(self, participant, contest):
+        # These are your exact weights
+        weights = {'label': 2, 'description': 3, 'fact': 5, 'reference': 4, 'image': 5}
+        api_url = "https://www.wikidata.org/w/api.php"
+
         params = {
             "action": "query",
             "list": "usercontribs",
-            "ucuser": username,
-            "ucstart": f"{end_date}T23:59:59Z",
-            "ucend": f"{start_date}T00:00:00Z",
+            "ucuser": participant.username,
+            "ucstart": f"{contest.end_date}T23:59:59Z",
+            "ucend": f"{contest.start_date}T00:00:00Z",
             "uclimit": "500",
             "ucprop": "comment|ids|flags|timestamp",
             "format": "json"
         }
 
-        response = requests.get(self.api_url, params=params).json()
+        response = requests.get(api_url, params=params).json()
         edits = response.get('query', {}).get('usercontribs', [])
 
         for edit in edits:
-            # 1. This bit sheild will help us to ignore automated edits
+            # 1. Bot Shield
             if 'bot' in edit:
                 continue
 
             comment = edit.get('comment', '')
             revid = edit.get('revid')
             
-            # 2. here it skips the edits with 'mw-reverted' Validation logic)
-            
-            # 3. it Checks for the Portuguese tag
+            # 2. PT Tag Check (Your superior logic!)
             is_pt = bool(re.search(r'\|pt', comment))
             
-            # 4. matching my weights
+            # 3. Action Matching
             points = 0
             action = "other"
 
             if 'P18' in comment:
-                points = self.weights['image']
-                action = "Image (P18)"
+                points, action = weights['image'], "Image (P18)"
             elif 'wbsetlabel' in comment:
-                points = self.weights['label']
-                action = "Label"
+                points, action = weights['label'], "Label"
             elif 'wbsetdescription' in comment:
-                points = self.weights['description']
-                action = "Description"
+                points, action = weights['description'], "Description"
             elif 'wbsetclaim-create' in comment:
-                points = self.weights['fact']
-                action = "Statement/Fact"
+                points, action = weights['fact'], "Statement/Fact"
             elif 'wbsetreference-add' in comment:
-                points = self.weights['reference']
-                action = "Reference"
+                points, action = weights['reference'], "Reference"
 
-            # 5. now it is saved to the record permanently
+            # 4. Save to the permanent record, now linked to the House
             WikidataContribution.objects.update_or_create(
+                contest=contest, # 🚨 Added Link
                 revid=revid,
                 defaults={
-                    'username': username,
+                    'participant': participant, # 🚨 Added Link
                     'timestamp': edit['timestamp'],
                     'is_portuguese': is_pt,
                     'action_type': action,
@@ -79,4 +74,4 @@ class WikiscoreEngine:
                 }
             )
 
-        print(f"AUDIT_COMPLETE: {username} records synchronized.")
+        self.stdout.write(f"AUDIT_COMPLETE: {participant.username} records synchronized.")
