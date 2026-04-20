@@ -32,7 +32,7 @@ class Command(BaseCommand):
         while True:
             if uccontinue: params['uccontinue'] = uccontinue
             
-            # 🚨 ADDED: timeout=10 to handle API stability
+            # I added a timeout=10 to handle API stability
             response = requests.get(api_url, params=params, timeout=10).json()
             edits = response.get('query', {}).get('usercontribs', [])
 
@@ -43,11 +43,11 @@ class Command(BaseCommand):
                 comment = edit.get('comment', '')
                 revid = edit.get('revid')
                 
-                # Extract the Item ID (QID)
+                # It will extract the Item ID (QID)
                 item_match = re.search(r'Q\d+', comment)
                 item_id = item_match.group(0) if item_match else None
 
-                # Linked-Only Mode Check
+                # It Linked-Only Mode Check
                 if getattr(contest, 'wikidata_linked_only', False):
                     allowed_items = getattr(contest, 'target_qids', [])
                     if item_id not in allowed_items: continue
@@ -61,13 +61,13 @@ class Command(BaseCommand):
                 elif 'wbsetclaim-create' in comment: points, action = weights.get('fact', 0), "Statement/Fact"
                 elif 'wbsetreference-add' in comment: points, action = weights.get('reference', 0), "Reference"
 
-                # 🚨 UPDATED: Saving the comment for audit purposes
+                # here saving the comment
                 WikidataContribution.objects.update_or_create(
                     contest=contest, revid=revid,
                     defaults={
                         'participant': participant,
                         'item': item_id,
-                        'comment': comment, # Added Paper Trail
+                        'comment': comment, # I added a Paper Trail
                         'timestamp': edit['timestamp'],
                         'is_portuguese': is_pt,
                         'action_type': action,
