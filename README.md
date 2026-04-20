@@ -37,6 +37,8 @@
 - [Speed & Traffic Control (Parallel Processing)](#speed--traffic-control-parallel-processing)
 - [The Professional Organizer Tools](#the-professional-organizer-tools)
 - [Python & Django Logic](#python--django-logic)
+- [Note](#note)
+- [Repository Structure](#repository-structure)
 - [AI Usage](#ai-usage)
 ---
 ## Introduction
@@ -103,7 +105,7 @@ I added three critical tools that make this a professional system for organizers
 
 ---
 
-### Python & Django Logic
+## Python & Django Logic
 
 I designed the backend logic to integrate seamlessly into the existing WikiScore environment without requiring structural rewrites.  
 
