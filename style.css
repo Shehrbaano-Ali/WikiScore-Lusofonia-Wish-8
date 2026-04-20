@@ -123,3 +123,5 @@ tr:hover .veto-btn { opacity: 0.6; }
 .animate-swipe {
     animation: swipe-hint 1.5s infinite ease-in-out;
 }
+
+.cursor-help { cursor: help; }
