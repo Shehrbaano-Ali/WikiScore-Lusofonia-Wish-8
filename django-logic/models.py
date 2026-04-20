@@ -4,7 +4,7 @@ class WikidataPointRule(models.Model):
     """
     Allows organizers to change points directly from the Django Admin panel.
     """
-    # Links point rules to the existing contest
+    # I Linked point rules to the existing contest
     contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
     action_type = models.CharField(max_length=50) # Label, Description, Fact, etc.
     points = models.IntegerField(default=0)
@@ -23,11 +23,11 @@ class WikidataContribution(models.Model):
     contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
     participant = models.ForeignKey('Participant', on_delete=models.CASCADE)
     
-    # Using BigInteger for safety against massive Wikidata revision IDs
+    # I used a BigInteger for safety against massive Wikidata revision IDs
     revid = models.BigIntegerField(unique=True)
     item = models.CharField(max_length=20, null=True, blank=True) 
     
-    # The raw audit trail for transparency
+    # I used a raw audit trail for transparency
     comment = models.TextField(blank=True, default='') 
     timestamp = models.DateTimeField()
     
