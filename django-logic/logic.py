@@ -52,7 +52,7 @@ class Command(BaseCommand):
                     allowed_items = getattr(contest, 'target_qids', [])
                     if item_id not in allowed_items: continue
 
-                is_pt = bool(re.search(r'\|pt', comment))
+                is_pt = bool(re.search(r'\|pt(-br)?', comment))
                 
                 points, action = 0, "other"
                 if 'P18' in comment: points, action = weights.get('image', 0), "Image (P18)"
