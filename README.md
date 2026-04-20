@@ -50,7 +50,7 @@ I built this prototype from scratch to be a full-stack answer. It features a rea
 
 ---
 ## Objectives
-1. For the *Precision* model will automatically identify and score Portuguese edits `(|pt)`.  
+1. For the *Precision* model automatically identifies and score Portuguese edits `(|pt)`.  
 2. Use a `Bot-Shield` and `Revert-Validator` to ensure only authentic work counts.  
 3. For *High Performance* use parallel processing to scan 100+ participants in seconds.  
 4. For *Permanent Storage* use SQL-based models so contest data is never lost.  
@@ -64,7 +64,7 @@ I built this prototype from scratch to be a full-stack answer. It features a rea
 
 ## Three Super Visual Features  
 1. The terminal identifies Continental vs. Brazilian edits instantly. It’s not just a counter; it’s culturally aware.
-2. I added a glowing Red Status Light 🔴. When it's on, it means the Anti-Cheat protocol is live and the engine is only awarding points for Targeted Items.
+2. The Strict-Mode 🔴 is enabled that is a real-time visual Anti-Cheat indicator, ensuring only mission critical items are being processed by the engine.
 3. I added a *LAST_TRACKED QID* for every participant. Organizers shouldn't have to guess where points come from;
    they can now tap the specific Item ID `(like Q1622272)` to see the exact Wikidata page being improved. 
 
@@ -94,7 +94,7 @@ I used badgeRules and renderLegend to create a *Ranking System* from `Level 1 to
 ## 📱Mobile Adaptation & UX Polishing
 A professional tool must be accessible. I implemented specific mobile-first logic to ensure the terminal remains functional on small screens:  
 
-1. Implemented a swipeable table logicnthat keeps the data-heavy leaderboard readable on mobile without squishing columns.
+1. Implemented a swipeable table logic that keeps the data-heavy leaderboard readable on mobile without squishing columns.
 2. I created a *Swipe to see scores* hint that only appears on mobile.
 3. Since mobile devices lack hover states, I built a custom `showNameTooltip` function. When a truncated username is tapped, a subtle terminal-style popup appears to show the full ID before fading away.
 4. Utilized Tailwind md: prefixes to ensure the layout snaps from a tight mobile view to a wide, balanced desktop sequence automatically.
@@ -154,7 +154,8 @@ They can simply add `load_wikidata` to the existing `update.py` sequence (right 
 ## Note
 *Organizers can make the competition tough by changing the points on badges in the UI, because I made the system fully editable.*  
 
-`I hope this prototype demonstrates my technical potential. I would appreciate more direct access to the Outreachy Dashboard systems in the future so I can build tools that run even smoother, without any API or caching blockages.`
+`This system is ready for live use. I designed the code to fit directly into the WikiScore main branch to provide a reliable base for all future Portuguese Wikidata contests.  
+In the future, I would appreciate more direct access to the Outreachy Dashboard systems so I can build tools that run even smoother.`
 
 ---
 
