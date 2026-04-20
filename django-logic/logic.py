@@ -1,76 +1,82 @@
 import requests
 import re
 from django.core.management.base import BaseCommand
-from .models import WikidataContribution, Contest, Participant
+from .models import WikidataContribution, WikidataPointRule, Contest, Participant
 
 class Command(BaseCommand):
     help = 'Fetches and scores Wikidata contributions for active contests'
 
     def handle(self, *args, **options):
-        # 1. It grabs all active contests from the system
         contests = Contest.objects.filter(is_active=True)
-        
         for contest in contests:
             participants = Participant.objects.filter(contest=contest)
             for participant in participants:
                 self.audit_and_score(participant, contest)
 
     def audit_and_score(self, participant, contest):
-        # These are my exact weights
-        weights = {'label': 2, 'description': 3, 'fact': 5, 'reference': 4, 'image': 5}
-        api_url = "https://www.wikidata.org/w/api.php"
+        if not getattr(contest, 'wikidata_enabled', False):
+            return 
 
+        rules = WikidataPointRule.objects.filter(contest=contest)
+        weights = {rule.action_type: rule.points for rule in rules} if rules.exists() else {'label': 2, 'description': 3, 'fact': 5, 'reference': 4, 'image': 5}
+            
+        api_url = "https://www.wikidata.org/w/api.php"
         params = {
-            "action": "query",
-            "list": "usercontribs",
+            "action": "query", "list": "usercontribs", 
             "ucuser": participant.username,
-            "ucstart": f"{contest.end_date}T23:59:59Z",
-            "ucend": f"{contest.start_date}T00:00:00Z",
-            "uclimit": "500",
-            "ucprop": "comment|ids|flags|timestamp",
-            "format": "json"
+            "ucstart": f"{contest.end_date}T23:59:59Z", "ucend": f"{contest.start_date}T00:00:00Z",
+            "uclimit": "500", "ucprop": "comment|ids|flags|timestamp", "format": "json"
         }
 
-        response = requests.get(api_url, params=params).json()
-        edits = response.get('query', {}).get('usercontribs', [])
-
-        for edit in edits:
-            # 1. Bot Shield
-            if 'bot' in edit:
-                continue
-
-            comment = edit.get('comment', '')
-            revid = edit.get('revid')
+        uccontinue = None
+        while True:
+            if uccontinue: params['uccontinue'] = uccontinue
             
-            # 2. PT Tag Check
-            is_pt = bool(re.search(r'\|pt', comment))
-            
-            # 3. Here is the Action Matching
-            points = 0
-            action = "other"
+            # 🚨 ADDED: timeout=10 to handle API stability
+            response = requests.get(api_url, params=params, timeout=10).json()
+            edits = response.get('query', {}).get('usercontribs', [])
 
-            if 'P18' in comment:
-                points, action = weights['image'], "Image (P18)"
-            elif 'wbsetlabel' in comment:
-                points, action = weights['label'], "Label"
-            elif 'wbsetdescription' in comment:
-                points, action = weights['description'], "Description"
-            elif 'wbsetclaim-create' in comment:
-                points, action = weights['fact'], "Statement/Fact"
-            elif 'wbsetreference-add' in comment:
-                points, action = weights['reference'], "Reference"
+            for edit in edits:
+                if getattr(contest, 'wikidata_exclude_bots', True) and 'bot' in edit:
+                    continue
 
-            # 4. it will save the data into the permanent record and link it to the sytem
-            WikidataContribution.objects.update_or_create(
-                contest=contest, # Link added
-                revid=revid,
-                defaults={
-                    'participant': participant, # Link added
-                    'timestamp': edit['timestamp'],
-                    'is_portuguese': is_pt,
-                    'action_type': action,
-                    'points': points
-                }
-            )
+                comment = edit.get('comment', '')
+                revid = edit.get('revid')
+                
+                # Extract the Item ID (QID)
+                item_match = re.search(r'Q\d+', comment)
+                item_id = item_match.group(0) if item_match else None
 
-        self.stdout.write(f"AUDIT_COMPLETE: {participant.username} records synchronized.")
+                # Linked-Only Mode Check
+                if getattr(contest, 'wikidata_linked_only', False):
+                    allowed_items = getattr(contest, 'target_qids', [])
+                    if item_id not in allowed_items: continue
+
+                is_pt = bool(re.search(r'\|pt', comment))
+                
+                points, action = 0, "other"
+                if 'P18' in comment: points, action = weights.get('image', 0), "Image (P18)"
+                elif 'wbsetlabel' in comment: points, action = weights.get('label', 0), "Label"
+                elif 'wbsetdescription' in comment: points, action = weights.get('description', 0), "Description"
+                elif 'wbsetclaim-create' in comment: points, action = weights.get('fact', 0), "Statement/Fact"
+                elif 'wbsetreference-add' in comment: points, action = weights.get('reference', 0), "Reference"
+
+                # 🚨 UPDATED: Saving the comment for audit purposes
+                WikidataContribution.objects.update_or_create(
+                    contest=contest, revid=revid,
+                    defaults={
+                        'participant': participant,
+                        'item': item_id,
+                        'comment': comment, # Added Paper Trail
+                        'timestamp': edit['timestamp'],
+                        'is_portuguese': is_pt,
+                        'action_type': action,
+                        'points': points
+                    }
+                )
+
+            if 'continue' in response and 'uccontinue' in response['continue']:
+                uccontinue = response['continue']['uccontinue']
+            else: break
+
+        self.stdout.write(f"AUDIT_COMPLETE: {participant.username} synchronized.")
