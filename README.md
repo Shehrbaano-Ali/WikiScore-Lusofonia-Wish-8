@@ -70,6 +70,13 @@ I built this prototype from scratch to be a full-stack answer. It features a rea
 
 ---
 ## Technical Steps & Implementation
+
+To ensure the engine is both fair and precise, I have implemented a weighted scoring algorithm:  
+
+## $$\text{Total Score} = \sum (\text{Labels} \times w_L) + (\text{Desc} \times w_D) + (\text{Facts} \times w_F) + (\text{Ref} \times w_R) + (\text{Img} \times w_I)$$  
+
+This allows the community to prioritize high-value edits (like References, labels, images etc) while still rewarding all forms of contribution.
+
 **1. The SQL and Newcomers:**  
 **i.** In my code, this is handled by models.py. For people new to coding, data usually disappears when you refresh a page. I used Django Models to create a permanent SQL Database. This means when a new person joins a contest, their name and points are saved forever on the server, not just for one session.  
 
@@ -135,19 +142,22 @@ I designed the backend logic to integrate seamlessly into the existing WikiScore
    `wikidata_points = sum(edit.points for edit in WikidataContribution.objects.filter(participant=user, is_portuguese=True))`
 7. My regex `r'\|pt(-br)?'` is specifically tuned for **Wish #8**. It’s the difference between a generic tool and a community tool.
 8. I added a `timeout=10` and `on_delete` protection. The engine is designed to be stable, resilient, and won't hang the server if the API is slow.
+9. I have optimized the scoring logic so it can be called directly by the existing CounterHandler.get_points() method.
+   This ensures that the new Wikidata points are injected into the leaderboard calculation without requiring any structural changes to the existing frontend
 
 ```
 Question:
-How to use it in the existing system? 
+How do we integrate this into the existing system?
 
 Answer:
-Because `logic.py` is built as a management command, maintainers can plug it directly into the current update pipeline.
-They can simply add `load_wikidata` to the existing `update.py` sequence (right alongside `load_edits` and `load_users`).  
-* The engine will wake up  
-* Read the active contests  
-* Fetch the Wikidata contributions  
-* Filter out the bots  
-* Log the scores directly into the database
+1. Because `logic.py` is built as a standard Django Management Command,
+   maintainers can plug it directly into the current update pipeline.
+
+2. Maintainers can simply add `load_wikidata` to the existing steps list in the `update.py` pipeline
+   (running alongside load_edits and load_reverts).
+3. The engine will automatically detect active contests, filter out bot traffic, and log the scores into the `WikidataContribution` vault.
+4. This setup allows the system to wake up, sync, and update the database in the background without affecting user experience.
+
 ```
 ---
 
