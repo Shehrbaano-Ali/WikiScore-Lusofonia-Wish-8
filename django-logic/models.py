@@ -1,30 +1,43 @@
 from django.db import models
 
-class WikidataContribution(models.Model):
+class WikidataPointRule(models.Model):
     """
-    The permanent storage for Wikidata scores. 
-    This is the 'Vault' that stores the math from logic.py.
+    Allows organizers to change points directly from the Django Admin panel.
     """
-
-    # This code will links my data directly to the existing WikiScore tables
+    # Links point rules to the existing contest
     contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
-    participant = models.ForeignKey('Participant', on_delete=models.CASCADE)
-    
-    revid = models.BigIntegerField(unique=True)
-    timestamp = models.DateTimeField()
-    
-    # logic of PT vs GL
-    # This code will help out to separates the Linguistic work from the Global technical work
-    is_portuguese = models.BooleanField(default=False)
-    
-    # below is the categorization of the edit
-    action_type = models.CharField(max_length=50) # Label, Description, Facts, etc.
+    action_type = models.CharField(max_length=50) # Label, Description, Fact, etc.
     points = models.IntegerField(default=0)
 
     class Meta:
-        # I updated to ensure uniqueness per contest, not just overall
+        unique_together = ('contest', 'action_type')
+        verbose_name = "Wikidata Point Rule"
+
+    def __str__(self):
+        return f"{self.contest.name} | {self.action_type}: {self.points}pts"
+
+class WikidataContribution(models.Model):
+    """
+    The 'Vault' that stores the audit trail and score for every edit.
+    """
+    contest = models.ForeignKey('Contest', on_delete=models.CASCADE)
+    participant = models.ForeignKey('Participant', on_delete=models.CASCADE)
+    
+    # Using BigInteger for safety against massive Wikidata revision IDs
+    revid = models.BigIntegerField(unique=True)
+    item = models.CharField(max_length=20, null=True, blank=True) 
+    
+    # 🚨 ADDED: The raw audit trail for transparency
+    comment = models.TextField(blank=True, default='') 
+    timestamp = models.DateTimeField()
+    
+    is_portuguese = models.BooleanField(default=False)
+    action_type = models.CharField(max_length=50) 
+    points = models.IntegerField(default=0)
+
+    class Meta:
         unique_together = ('contest', 'revid')
         verbose_name = "Wikidata Contribution"
 
     def __str__(self):
-        return f"{self.participant.username} | {self.revid} | {self.points}pts"
+        return f"{self.participant.username} | {self.item} | {self.points}pts"
