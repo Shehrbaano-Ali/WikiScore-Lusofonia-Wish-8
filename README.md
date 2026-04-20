@@ -201,6 +201,6 @@ All code, logic (PT vs GL split), and the Cache Buster fix were manually verifie
 
 ---
 
-*Here is the link to my _**[Blog](https://shehrbanoali66.hashnode.dev/post-contribution-task-creating-a-live-data-safe-tool-for-the-lusophone-wishlist-8)**_*  
+*Here is the link to my _**[Blog](https://shehrbanoali66.hashnode.dev/post-contribution-task-creating-a-live-tool-for-the-lusophone-wishlist-8)**_*  
 *This work is submitted for the Outreachy 2026 internship application for the Wikimedia Project.*  
 *~Shehrbano Ali*
