@@ -169,8 +169,7 @@ function renderTable() {
         <tr class="border-b border-[#2d2d35] ${p.isVetoed ? 'grayscale' : ''}">
             <td class="pl-3 md:pl-6 pr-2 py-4 text-white font-bold flex items-center gap-1 md:gap-2 w-[130px] md:w-[180px]">
                 <span class="truncate cursor-help" 
-                      title="${p.name}" 
-                      onclick="alert('FULL_ID: ${p.name}')">
+                      onclick="showNameTooltip(event, '${p.name}')">
                     ${p.name}
                 </span>
                 ${(p.isBot && showBots) ? '<span class="bot-tag px-1 py-0.5 rounded ml-2">BOT</span>' : ''}
@@ -280,3 +279,47 @@ function setSort(val) { currentSort = val; renderTable(); }
 document.getElementById('search-name').addEventListener('input', renderTable);
 renderLegend();
 harvestData("WMB/Cada_Livro_Seu_Público_2026_-_edite_sobre_livros_e_autores_na_Wikipédia");
+
+function showNameTooltip(event, name) {
+    // Remove any existing tooltip first
+    const existing = document.getElementById('temp-tooltip');
+    if (existing) existing.remove();
+
+    // Create a tiny "ghost" tooltip
+    const tip = document.createElement('div');
+    tip.id = 'temp-tooltip';
+    tip.innerText = name;
+    
+    // Styling it to look like a small, clean terminal popup
+    tip.className = "fixed bg-[#0a0a0c] border border-[#38bdf8] text-[#38bdf8] text-[10px] px-2 py-1 rounded shadow-2xl z-[9999] pointer-events-none font-mono uppercase tracking-tighter animate-fade-in";
+    
+    // Position it right where you tapped
+    tip.style.left = `${event.clientX}px`;
+    tip.style.top = `${event.clientY - 30}px`;
+
+    document.body.appendChild(tip);
+
+    // Make it disappear after 2 seconds
+    setTimeout(() => {
+        tip.classList.add('opacity-0');
+        setTimeout(() => tip.remove(), 500);
+    }, 2000);
+}
+
+// HIDE SWIPE HINT ON SCROLL
+const scrollContainer = document.querySelector('.overflow-x-auto');
+const swipeHint = document.getElementById('swipe-hint');
+
+if (scrollContainer && swipeHint) {
+    scrollContainer.addEventListener('scroll', () => {
+        // If user swiped more than 20px to the right, hide it
+        if (scrollContainer.scrollLeft > 20) {
+            swipeHint.style.opacity = '0';
+            swipeHint.style.pointerEvents = 'none';
+        } else {
+            // If they are back at the start (0px), show it again
+            swipeHint.style.opacity = '1';
+            swipeHint.style.pointerEvents = 'auto';
+        }
+    });
+}
